@@ -5,15 +5,30 @@
 ![Docs](https://img.shields.io/badge/docs-28-5ccfe6)
 ![Audit Scripts](https://img.shields.io/badge/audit%20scripts-4-ffb454)
 ![Tested with moto](https://img.shields.io/badge/tested%20with-moto-ff6b6b)
+![Terraform](https://img.shields.io/badge/terraform-vulnerable%20%26%20remediated-7b42bc)
 
-A production-grade AWS security reference for DevOps and SRE engineers. Real attack scenarios, detection CLI commands, hardening checklists, and runnable audit scripts — all verified against a local moto environment.
+A production-grade AWS security reference for DevOps and SRE engineers. Real attack scenarios, detection CLI commands, hardening checklists, runnable audit scripts, and Terraform environments to test against — both deliberately misconfigured and fully hardened.
 
 > **Audience:** Mid-level DevOps/SRE engineers  
 > **Style:** Scenario-driven — understand the attack, detect it, fix it
 
 ---
 
-## Sections
+## What's in this repo
+
+| Component | What it is |
+|---|---|
+| `docs/` | 28 markdown docs across 8 AWS security domains |
+| `scripts/` | 4 audit shell scripts — run against any AWS account |
+| `tests/` | Moto-based local test harness — no real AWS needed |
+| `terraform/` | Vulnerable + remediated environments for real AWS testing |
+| `index.html` | Interactive portfolio site — browsable terminal-style docs |
+
+---
+
+## Docs — 8 Sections
+
+Each doc covers: attack scenario → detection CLI → fix CLI → checklist.
 
 | # | Topic | What's Covered |
 |---|-------|----------------|
@@ -28,6 +43,81 @@ A production-grade AWS security reference for DevOps and SRE engineers. Real att
 
 ---
 
+## Audit Scripts
+
+Four shell scripts that check a live AWS account for security misconfigurations. Exit code `1` on critical findings — safe to use as CI/CD pipeline gates.
+
+```bash
+git clone https://github.com/sharanch/aws-security-best-practices
+cd aws-security-best-practices
+chmod +x scripts/*.sh
+
+bash scripts/audit-iam.sh     --profile my-profile --region ap-south-1
+bash scripts/audit-ec2.sh     --profile my-profile --region ap-south-1
+bash scripts/audit-network.sh --profile my-profile --region ap-south-1
+bash scripts/audit-s3-rds.sh  --profile my-profile --region ap-south-1
+```
+
+| Script | Checks |
+|--------|--------|
+| `audit-iam.sh` | Root access keys, MFA, key age, admin access, dangerous trust policies, password policy, Access Analyzer, CloudTrail, GuardDuty |
+| `audit-ec2.sh` | IMDSv2, public IPs, open SSH/RDP, overprivileged instance roles, SSM readiness, EBS encryption |
+| `audit-network.sh` | VPC flow logs, VPC endpoints, default VPC, all-traffic SGs, S3 account BPA, CloudTrail |
+| `audit-s3-rds.sh` | Bucket BPA/encryption/versioning/logging, public bucket policies, RDS public access/encryption/auth/backups, Lambda env var secrets and public URLs |
+
+---
+
+## Testing
+
+### Option 1 — Local with moto (no AWS account needed)
+
+```bash
+# Requires: python3, aws-cli, curl
+bash tests/test-all.sh
+```
+
+Starts a moto server, creates deliberately misconfigured resources, runs all 4 audit scripts, prints findings, shuts down. Verified output:
+
+```
+  FAILED  IAM Security Audit      — 5 critical,  3 warnings
+  FAILED  EC2 Security Audit      — 4 critical,  5 warnings
+  FAILED  Network Security Audit  — 4 critical,  6 warnings
+  FAILED  S3 + RDS + Lambda Audit — 7 critical, 16 warnings
+
+  Total critical: 20  |  Total warnings: 30
+```
+
+See [`tests/README.md`](./tests/README.md) for the full resource → finding mapping.
+
+### Option 2 — Real AWS with Terraform (~$0.02/hr)
+
+Two Terraform environments that provision real AWS resources:
+
+```bash
+# Deploy vulnerable — triggers all audit findings
+cd terraform/vulnerable
+terraform init && terraform apply -auto-approve
+
+# Run audit scripts against real AWS
+bash scripts/audit-iam.sh --region ap-south-1
+bash scripts/audit-ec2.sh --region ap-south-1
+
+# Deploy remediated — audit scripts should mostly pass
+cd ../remediated
+terraform init && terraform apply -auto-approve -var="db_password=StrongPass123!"
+
+# Run audit scripts again — compare results
+bash scripts/audit-iam.sh --region ap-south-1
+bash scripts/audit-ec2.sh --region ap-south-1
+
+# Destroy when done
+terraform destroy -auto-approve
+```
+
+See [`terraform/README.md`](./terraform/README.md) for the full resource list, settings comparison table, and destroy instructions.
+
+---
+
 ## Core Philosophy
 
 ```
@@ -38,117 +128,36 @@ Design so that when it does:
   - Recovery is fast
 ```
 
-Every doc follows the same structure:
-
-1. **Attack scenario** — how it actually gets exploited
-2. **Detection** — CLI commands to find it in a live account
-3. **Fix** — CLI commands to remediate it
-4. **Checklist** — what to verify before moving on
+Every doc follows: **attack scenario → detection → fix → checklist**.
 
 ---
 
-## Audit Scripts
-
-Four shell scripts that assess a live AWS account and exit with code `1` on critical findings — safe to drop into CI/CD pipelines as security gates.
+## Quick Reference
 
 ```bash
-git clone https://github.com/sharanch/aws-security-best-practices
-cd aws-security-best-practices
-chmod +x scripts/*.sh
-
-# IAM — root keys, MFA, admin access, dangerous trust policies, GuardDuty, CloudTrail
-./scripts/audit-iam.sh --profile my-profile --region ap-south-1
-
-# EC2 — IMDSv2, public IPs, open SSH/RDP, overprivileged roles, EBS encryption
-./scripts/audit-ec2.sh --profile my-profile --region ap-south-1
-
-# Network — VPC flow logs, VPC endpoints, security groups, S3 public access block
-./scripts/audit-network.sh --profile my-profile --region ap-south-1
-
-# S3 + RDS + Lambda — public buckets, encryption, public RDS, env var secrets, Lambda URLs
-./scripts/audit-s3-rds.sh --profile my-profile --region ap-south-1
-```
-
-### What each script checks
-
-| Script | Checks |
-|--------|--------|
-| `audit-iam.sh` | Root access keys, MFA per user, key age/usage, AdministratorAccess assignments, dangerous trust policies (`Principal: *`), password policy, Access Analyzer, CloudTrail, GuardDuty |
-| `audit-ec2.sh` | IMDSv2 enforcement, public IPs, SSH/RDP/all-traffic SGs open to world, overprivileged instance roles, SSM Agent readiness, EBS encryption |
-| `audit-network.sh` | VPC flow logs, S3/STS/DynamoDB VPC endpoints, default VPC presence, all-traffic inbound SGs, S3 account-level BPA, CloudTrail coverage |
-| `audit-s3-rds.sh` | Account BPA settings, per-bucket encryption/versioning/logging, `Principal: *` bucket policies, RDS public access/encryption/IAM auth/deletion protection/backups, public snapshots, Lambda env var secrets, Lambda public URLs |
-
----
-
-## Local Testing with Moto
-
-Test all audit scripts locally against a deliberately misconfigured environment — no real AWS account needed.
-
-```bash
-# Requires: python3, aws-cli, curl
-bash tests/test-all.sh
-```
-
-This single command:
-1. Creates a Python venv at `tests/.venv` and installs moto + boto3
-2. Starts a local moto server on port 5000
-3. Creates misconfigured resources across IAM, EC2, VPC, S3, RDS, and Lambda
-4. Runs all 4 audit scripts against the mock environment
-5. Prints findings and stops the server
-
-### Verified output
-
-```
-══════════════════════════════════════════
-  OVERALL RESULTS
-══════════════════════════════════════════
-  FAILED  IAM Security Audit      — 5 critical, 3 warnings
-  FAILED  EC2 Security Audit      — 4 critical, 5 warnings
-  FAILED  Network Security Audit  — 4 critical, 6 warnings
-  FAILED  S3 + RDS + Lambda Audit — 7 critical, 16 warnings
-
-  Total critical: 20
-  Total warnings: 30
-
-Vulnerable environment confirmed — 20 critical findings detected.
-These are expected — this is a deliberately misconfigured test environment.
-```
-
-Each finding maps to a specific misconfigured resource. See [`tests/README.md`](./tests/README.md) for the full mapping table.
-
----
-
-## Quick Reference — Most Critical Controls
-
-```bash
-# Root account — should return 0
+# Root account has no access keys (should return 0)
 aws iam get-account-summary --query 'SummaryMap.AccountAccessKeysPresent'
 
-# Users with no MFA
+# Find users with no MFA
 aws iam get-credential-report --query 'Content' --output text | \
   base64 -d | cut -d',' -f1,4,8 | grep ',false'
 
-# EC2 instances with IMDSv1 enabled (should be empty)
+# Find EC2 instances with IMDSv1 (should be empty)
 aws ec2 describe-instances \
   --filters "Name=metadata-options.http-tokens,Values=optional" \
   --query 'Reservations[*].Instances[*].[InstanceId,Tags[?Key==`Name`].Value|[0]]' \
   --output table
 
-# Security groups with SSH open to world
+# Find security groups with SSH open to world
 aws ec2 describe-security-groups \
   --filters "Name=ip-permission.from-port,Values=22" \
             "Name=ip-permission.cidr,Values=0.0.0.0/0" \
   --query 'SecurityGroups[*].[GroupId,GroupName]' \
   --output table
 
-# RDS instances that are publicly accessible
+# Find publicly accessible RDS instances
 aws rds describe-db-instances \
   --query 'DBInstances[?PubliclyAccessible==`true`].[DBInstanceIdentifier,Engine]' \
-  --output table
-
-# CloudTrail status
-aws cloudtrail describe-trails \
-  --query 'trailList[*].[Name,IsMultiRegionTrail,LogFileValidationEnabled]' \
   --output table
 ```
 
@@ -160,46 +169,46 @@ aws cloudtrail describe-trails \
 aws-security-best-practices/
 ├── README.md
 ├── LICENSE
-├── DEPLOY.md                        ← GitHub Pages + Cloudflare DNS setup
-├── index.html                       ← Interactive portfolio site (terminal aesthetic)
-├── .github/workflows/
-│   └── deploy.yml                   ← Auto-deploys index.html to GitHub Pages
+├── index.html                       ← Interactive portfolio site
+├── .github/workflows/deploy.yml     ← Auto-deploys to GitHub Pages
 ├── docs/
-│   ├── 01-iam-credentials/          ← 4 docs: static keys, role abuse, priv esc, SSO
-│   ├── 02-ec2-compute/              ← 3 docs: IMDSv2, instance roles, SSH hardening
-│   ├── 03-network-vpc/              ← 3 docs: security groups, VPC endpoints, flow logs
-│   ├── 04-cicd-pipeline/            ← 3 docs: OIDC auth, secrets, pipeline hardening
-│   ├── 05-s3/                       ← 3 docs: public access, bucket policies, data protection
-│   ├── 06-lambda/                   ← 3 docs: execution roles, env vars, function hardening
-│   ├── 07-rds/                      ← 3 docs: public access, auth/encryption, auditing
-│   └── 08-detection/                ← 3 docs: CloudTrail, GuardDuty, Security Hub
+│   ├── 01-iam-credentials/          ← 4 docs
+│   ├── 02-ec2-compute/              ← 3 docs
+│   ├── 03-network-vpc/              ← 3 docs
+│   ├── 04-cicd-pipeline/            ← 3 docs
+│   ├── 05-s3/                       ← 3 docs
+│   ├── 06-lambda/                   ← 3 docs
+│   ├── 07-rds/                      ← 3 docs
+│   └── 08-detection/                ← 3 docs
 ├── scripts/
 │   ├── audit-iam.sh
 │   ├── audit-ec2.sh
 │   ├── audit-network.sh
 │   └── audit-s3-rds.sh
+├── terraform/
+│   ├── modules/                     ← iam, ec2, s3, rds, lambda
+│   ├── vulnerable/                  ← misconfigured resources
+│   └── remediated/                  ← hardened resources
 └── tests/
-    ├── README.md                    ← Test harness docs + finding → resource mapping
-    ├── requirements.txt             ← moto + boto3
-    ├── test-all.sh                  ← One-command test runner
-    ├── setup_vulnerable_env.py      ← Creates misconfigured resources in moto
-    └── run-audit-local.sh           ← Runs all 4 scripts against moto
+    ├── test-all.sh                  ← one-command moto test runner
+    ├── setup_vulnerable_env.py      ← creates misconfigured resources
+    └── run-audit-local.sh           ← runs all 4 scripts against moto
 ```
 
 ---
 
 ## License
 
-This project is licensed under the [MIT License](./LICENSE) — free to use, share, and adapt with attribution.
+[MIT License](./LICENSE) — free to use, share, and adapt with attribution.
 
 ---
 
 ## Contributing
 
-Found a gap or a new attack vector? PRs welcome. Follow the existing format:
+PRs welcome. Follow the existing format:
 
-1. Explain the attack scenario first
-2. Show the CLI commands to detect it in a live account
-3. Show the CLI commands to fix it
-4. Add a checklist at the end
-5. If adding a new misconfigured resource for testing, update `tests/setup_vulnerable_env.py` and `tests/README.md`
+1. Attack scenario first
+2. Detection CLI commands
+3. Fix CLI commands
+4. Checklist at the end
+5. If adding a new test resource — update `tests/setup_vulnerable_env.py`, `tests/README.md`, and the relevant Terraform module

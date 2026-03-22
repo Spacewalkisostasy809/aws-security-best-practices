@@ -1,4 +1,4 @@
-# AWS credentials — never commit these
+# ── AWS Credentials ───────────────────────────────────────────────
 .env
 .env.*
 *.pem
@@ -6,23 +6,42 @@
 credentials
 aws-credentials*
 
-# Python venv
+# ── Python ────────────────────────────────────────────────────────
 tests/.venv/
 .venv/
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+.Python
 
-# OS
+# ── Terraform ─────────────────────────────────────────────────────
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+*.tfvars
+!*.tfvars.example
+**/.terraform.lock.hcl
+terraform/modules/**/*.zip
+
+# ── OS ────────────────────────────────────────────────────────────
 .DS_Store
+.DS_Store?
 Thumbs.db
+ehthumbs.db
+Desktop.ini
 
-# Editor
+# ── Editor ────────────────────────────────────────────────────────
 .vscode/
 .idea/
 *.swp
 *.swo
+*~
+.project
+.classpath
 
-# Audit output files
+# ── Audit output / temp ───────────────────────────────────────────
 audit-*.txt
 audit-*.log
-/tmp/
+/tmp/moto.log
